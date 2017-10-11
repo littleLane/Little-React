@@ -133,6 +133,14 @@ module.exports = {
           // smaller than specified limit in bytes as data URLs to avoid requests.
           // A missing `test` is equivalent to a match.
           {
+            exclude: [
+              /\.html$/,
+              /\.(js|jsx)$/,
+              /\.css$/,
+              /\.json$/,
+              /\.svg$/,
+              /\.scss$/
+            ],
             test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
             loader: require.resolve('url-loader'),
             options: {
@@ -189,6 +197,11 @@ module.exports = {
                 },
               },
             ],
+          },
+          {
+            test: /\.scss$/,
+            include: paths.appSrc,
+            loaders: ["style-loader", "css-loader", "sass-loader"]
           },
           // "file" loader makes sure those assets get served by WebpackDevServer.
           // When you `import` an asset, you get its (virtual) filename.

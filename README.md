@@ -21,3 +21,67 @@
 > npm run eject
 
 等命令执行完后，大家想看到的文件就都会出现了。
+
+### 加入工具
+
+- 1、加入 ` scss `
+
+> npm install sass-loader node-sass --save-dev -> 安装 ` sass ` 编译工具
+
+> 修改 ` webpack.config.dev.js ` 配置
+
+```javascript
+  loaders: [
+    {
+      exclude: [
+        /\.html$/,
+        /\.(js|jsx)$/,
+        /\.css$/,
+        /\.json$/,
+        /\.svg$/,
+        /\.scss$/
+      ],
+      loader: 'url-loader',
+      query: {
+        limit: 10000,
+        name: 'static/media/[name].[hash:8].[ext]'
+      }
+    },
+    {
+      test: /\.css$/,
+      loader: 'style-loader!css-loader?importLoaders=1!postcss'
+    },
+    {
+      test: /\.scss$/,
+      include: paths.appSrc,
+      loaders: ["style-loader", "css-loader", "sass-loader"]
+    }
+  ]
+```
+
+> 修改 ` webpack.config.prod.js ` 配置
+
+```javascript
+  loaders: [
+    {
+      exclude: [
+        /\.html$/,
+        /\.(js|jsx)$/,
+        /\.css$/,
+        /\.json$/,
+        /\.svg$/,
+        /\.scss$/
+      ],
+      loader: 'url-loader',
+      query: {
+        limit: 10000,
+        name: 'static/media/[name].[hash:8].[ext]'
+      }
+    },
+    {
+      test: /\.(scss|sass)$/,
+      include: paths.appSrc,
+      loader: ExtractTextPlugin.extract('style-loader', 'css-loader?importLoaders=1!postcss')
+    }
+  ] 
+```
