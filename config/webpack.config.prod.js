@@ -136,14 +136,6 @@ module.exports = {
           // "url" loader works just like "file" loader but it also embeds
           // assets smaller than specified size as data URLs to avoid requests.
           {
-            exclude: [
-              /\.html$/,
-              /\.(js|jsx)$/,
-              /\.css$/,
-              /\.json$/,
-              /\.svg$/,
-              /\.scss$/
-            ],        
             test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
             loader: require.resolve('url-loader'),
             options: {
@@ -214,11 +206,6 @@ module.exports = {
               )
             ),
             // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
-          },
-          {
-            test: /\.(scss|sass)$/,
-            include: paths.appSrc,
-            loader: ExtractTextPlugin.extract('style-loader', 'css-loader?importLoaders=1!postcss')
           },
           // "file" loader makes sure assets end up in the `build` folder.
           // When you `import` an asset, you get its filename.

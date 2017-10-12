@@ -88,6 +88,120 @@
   ] 
 ```
 
+> 注意：这里一定是要修改生产和开发两个配置文件
+
 - 2、加入 ` ant design `
 
 > ` yarn add antd ` -> 从 ` yarn ` 或者 ` npm ` 安装并引入 ` antd `
+
+> 修改 ` src/App.js `，引入 ` antd ` 的按钮组件
+
+```javascript
+  import React, { Component } from 'react';
+  import Button from 'antd/lib/button';
+  import './App.css';
+
+  class App extends Component {
+    render() {
+      return (
+        <div className="App">
+          <Button type="primary">Button</Button>
+        </div>
+      );
+    }
+  }
+
+  export default App;
+```
+
+> 修改 ` src/App.css `，在文件顶部引入 ` antd/dist/antd.css `
+
+```css
+  @import '~antd/dist/antd.css';
+
+  .App {
+    text-align: center;
+  }
+```
+
+- 3、按需加入 ` ant design `
+
+> ` yarn add react-app-rewired --dev ` 引入 ` react-app-rewired ` 并修改 ` package.json ` 里面的启动配置
+
+```javascript
+  /* package.json */
+  "scripts": {
+  -   "start": "react-scripts start",
+  +   "start": "react-app-rewired start",
+  -   "build": "react-scripts build",
+  +   "build": "react-app-rewired build",
+  -   "test": "react-scripts test --env=jsdom",
+  +   "test": "react-app-rewired test --env=jsdom",
+  }
+```
+
+> 在项目根目录创建一个 ` config-overrides.js ` 用于修改默认配置。
+
+```javascript
+  module.exports = function override(config, env) {
+    // do stuff with the webpack config...
+    return config;
+  };
+```
+
+> ` yarn add babel-plugin-import --dev ` 加入按需加载组件代码和样式的 ` babel ` 插件，并修改 ` config-overrides.js ` 文件
+
+```javascript
++ const { injectBabelPlugin } = require('react-app-rewired');
+
+  module.exports = function override(config, env) {
++   config = injectBabelPlugin(['import', { libraryName: 'antd', style: 'css' }], config);
+    return config;
+  };
+```
+
+> 移除前面在 ` src/App.css ` 里全量添加的 ` @import '~antd/dist/antd.css'; ` 样式代码，并且按下面的格式引入模块。  
+
+```javascript
+  // scr/App.js
+  import React, { Component } from 'react';
+- import Button from 'antd/lib/button';
++ import { Button } from 'antd';
+  import './App.css';
+
+  class App extends Component {
+    render() {
+      return (
+        <div className="App">
+          <Button type="primary">Button</Button>
+        </div>
+      );
+    }
+  }
+
+  export default App;
+```
+
+- 4、自定义 ` ant design ` 主题
+
+自定义主题需要用到 less 变量覆盖功能
+
+> ` yarn add react-app-rewire-less --dev ` 引入 react-app-rewire 的 less 插件 react-app-rewire-less 来帮助加载 less 样式，同时修改 config-overrides.js 文件。
+
+```javascript
+  const { injectBabelPlugin } = require('react-app-rewired');
++ const rewireLess = require('react-app-rewire-less');
+
+  module.exports = function override(config, env) {
+-   config = injectBabelPlugin(['import', { libraryName: 'antd', style: 'css' }], config);
++   config = injectBabelPlugin(['import', { libraryName: 'antd', style: true }], config);
++   config = rewireLess(config, env, {
++     modifyVars: { "@primary-color": "#1DA57A" },
++   });
+    return config;
+  };
+```
+
+这里利用了 less-loader 的 modifyVars 来进行主题配置
+
+> 注意：执行这里之前我们做的 ` scss ` 配置样式就不起作用了，但是将 ` scss ` 改成 ` less ` 是 ` OK ` 的，这里先留个问题，怎么在按需加载 ` ant design ` 时，同时引入 ` scss ` 样式文件。
